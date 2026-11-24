@@ -1,0 +1,32 @@
+# Correccion ataque de etiqueta - RBAC
+# Solo sensor-sa puede crear pods de sensores. El resto NO.
+# La restriccion por etiqueta se refuerza con Kyverno (ver kyverno-solo-sensores.yaml)
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sensor-sa
+  namespace: agrosugar
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sensor-creator
+  namespace: agrosugar
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sensor-creator-binding
+  namespace: agrosugar
+subjects:
+- kind: ServiceAccount
+  name: sensor-sa
+  namespace: agrosugar
+roleRef:
+  kind: Role
+  name: sensor-creator
+  apiGroup: rbac.authorization.k8s.io

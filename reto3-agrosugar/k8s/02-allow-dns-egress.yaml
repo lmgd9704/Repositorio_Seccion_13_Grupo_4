@@ -1,0 +1,19 @@
+# Politica 2 - allow-dns-egress
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-egress
+  namespace: agrosugar
+spec:
+  podSelector:
+    matchLabels:
+      app: sensor
+  policyTypes: ["Egress"]
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53

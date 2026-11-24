@@ -1,0 +1,28 @@
+# Reto 2c - HospitValle - Pod con minimo privilegio
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-uci
+  namespace: hospitvalle
+  labels:
+    app: app-uci
+spec:
+  serviceAccountName: app-uci-sa
+  securityContext:
+    runAsUser: 10001
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: app
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    securityContext:
+      runAsUser: 10001
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop: ["ALL"]
+      # NET_RAW NO se anade: drop ALL ya lo elimina

@@ -1,0 +1,25 @@
+# Control complementario - Kyverno (si esta instalado)
+# Rechaza pods con app=sensor que no usen sensor-sa
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: solo-sensores-con-sa
+spec:
+  validationFailureAction: Enforce
+  rules:
+  - name: sensor-debe-usar-sa
+    match:
+      any:
+      - resources:
+          kinds: ["Pod"]
+    validate:
+      message: "Solo sensor-sa puede usar la etiqueta app=sensor."
+      deny:
+        conditions:
+          any:
+          - key: "{{ request.object.metadata.labels.app }}"
+            operator: Equals
+            value: sensor
+          - key: "{{ request.object.spec.serviceAccountName }}"
+            operator: NotEquals
+            value: sensor-sa
